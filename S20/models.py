@@ -54,6 +54,8 @@ class AcademicPeriod(BaseModel):
         )
 
     def save(self, *args, **kwargs):
+        if self.end_date <= self.start_date:
+            raise ValueError("end_date должна быть позже start_date")
         self.updated_at = datetime.now()
         return super().save(*args, **kwargs)
 
