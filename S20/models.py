@@ -15,7 +15,7 @@ class BaseModel(Model):
 class AcademicYear(BaseModel):
     """Учебный год, к которому привязаны периоды"""
     id = AutoField(primary_key=True)
-    name = CharField(max_length=20, unique=True, constraints=[Check("length(name) >= 1")])
+    name = CharField(max_length=100, unique=True, constraints=[Check("length(name) >= 1")])
     start_date = DateField()
     end_date = DateField()
     is_active = BooleanField(default=True)
@@ -54,7 +54,7 @@ class AcademicPeriod(BaseModel):
         )
 
     def save(self, *args, **kwargs):
-        if self.end_date <= self.start_date:
+        if self.end_date < self.start_date:
             raise ValueError("end_date должна быть позже start_date")
         self.updated_at = datetime.now()
         return super().save(*args, **kwargs)
@@ -65,7 +65,7 @@ class AcademicPeriod(BaseModel):
         updated = cls.update(is_active=False).where(
             (cls.id == period_id) & (cls.is_active == True)
         ).execute()
-        return updated > 0
+        return bool(updated)
 
 
 class PeriodGroup(BaseModel):
